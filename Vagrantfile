@@ -25,6 +25,73 @@ server {
 }
 EOF
       systemctl restart nginx
+
+      ## Descomentar para realizar la tarea de ampliacion
+      
+      # apt-get update
+
+      # apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+
+      # curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+
+      # echo "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+      # apt-get update
+      # apt-get install -y docker-ce docker-ce-cli containerd.io
+
+      # systemctl enable docker
+      # systemctl start docker
+
+      # curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+      # chmod +x /usr/local/bin/docker-compose
+
+      # docker-compose --version
+
+      # echo "version: '3.7'
+      # services:
+      #   w1:
+      #     image: nginx:latest
+      #     container_name: w1
+      #     ports:
+      #       - '8080:80'
+      #     volumes:
+      #       - ./html:/usr/share/nginx/html:ro
+      #   proxy:
+      #     image: nginx:latest
+      #     container_name: proxy
+      #     ports:
+      #       - '80:80'
+      #     volumes:
+      #       - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      #     depends_on:
+      #       - w1" > /vagrant/docker-compose.yml
+
+      # mkdir -p /vagrant/html
+      # echo "<!DOCTYPE html>
+      # <html lang='en'>
+      # <head>
+      #     <meta charset='UTF-8'>
+      #     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+      #     <title>example.test</title>
+      # </head>
+      # <body>
+      #     <h1>example.test</h1>
+      #     <h2>Bienvenido</h2>
+      #     <p>Servidor w1</p>
+      # </body>
+      # </html>" > /vagrant/html/index.html
+
+      # echo "server {
+      #     listen 80;
+      #     server_name example.test www.example.test;
+
+      #     location / {
+      #         proxy_pass http://w1:8080;
+      #     }
+      # }" > /vagrant/nginx.conf
+
+      # cd /vagrant
+      # docker-compose up -d
     SHELL
   end
 
