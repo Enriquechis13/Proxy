@@ -1,0 +1,15 @@
+Proxy inverso
+=============
+
+Configuraremos un proxy inverso con Nginx y observaremos su 
+funcionamiento.
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contenidos:
+
+   introduccion
+   proxy-inverso
+   comprobacion
+   ampliacion
+
