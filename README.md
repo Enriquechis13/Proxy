@@ -180,16 +180,148 @@ sudo systemctl restart nginx
 
 - La verificacion del navegador (pestaña `Network`), son las dos capturas anteriores.
 
-## Ampliacion
-- Detener las máquinas:
+
+## Ampliación con Docker y Docker Compose
+
+En esta ampliación, configuraremos el entorno utilizando contenedores Docker. Crearemos un contenedor para el servidor web (`w1`), otro para el proxy inverso (`proxy`) y un archivo `docker-compose.yml` para la gestión.
+
+**1. Instalación de Docker y Docker Compose**
+
+Ejecutar los siguientes comandos en ambas máquinas virtuales:
+
 ```bash
-vagrant halt
+apt-get update
+apt-get install -y apt-transport-https ca-certificates curl gnupg lsb-release
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add -
+echo "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
+apt-get update
+apt-get install -y docker-ce docker-ce-cli containerd.io
 ```
 
-- Destruir las máquinas:
+![Imagen proxy](img/Captura7.PNG)
+
+Habilitar y arrancar Docker:
+
 ```bash
-vagrant destroy
+systemctl enable docker
+systemctl start docker
 ```
+
+Instalar Docker Compose:
+
+```bash
+curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+```
+
+Verificar la instalación:
+
+```bash
+docker-compose --version
+```
+
+**2. Configuración de Docker Compose**
+
+Crear el archivo `/vagrant/docker-compose.yml` con la siguiente configuración:
+
+```yaml
+version: "3.8"
+
+services:
+  web:
+    image: nginx:latest
+    container_name: w1
+    volumes:
+      - ./web/html:/usr/share/nginx/html
+      - ./web/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - mynetwork
+
+  proxy:
+    image: nginx:latest
+    container_name: proxy
+    ports:
+      - "80:80"
+    volumes:
+      - ./proxy/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge
+```
+
+**3. Configuración del contenido web y Nginx**
+
+Crear la carpeta `/vagrant/html` y un archivo `index.html` dentro:
+
+```bash
+mkdir -p /vagrant/html
+cat > /vagrant/html/index.html <<EOF
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <title>example.test</title>
+</head>
+<body>
+    <h1>example.test</h1>
+    <h2>Bienvenido</h2>
+    <p>Servidor w1</p>
+</body>
+</html>
+EOF
+```
+
+Crear la configuración de Nginx para el proxy inverso en `/vagrant/nginx.conf`:
+
+```nginx
+server {
+    listen 80;
+    server_name example.test www.example.test;
+
+    location / {
+        proxy_pass http://w1:80;
+        add_header X-friend enrique;
+    }
+}
+```
+
+![Imagen proxy](img/CapturaAMPLIACION1.PNG)
+
+**4. Despliegue de Contenedores**
+
+Ir al directorio `/vagrant` y ejecutar:
+
+```bash
+docker-compose up -d
+```
+
+Verificar los contenedores en ejecución:
+
+```bash
+docker ps
+```
+
+![Imagen proxy](img/CapturaAMPLIACION3.PNG)
+
+**5. Prueba y Verificación**
+
+Acceder a `http://www.example.test`
+
+![Imagen proxy](img/CapturaAMPLIACION2.PNG)
+
+### **6. Detener y Eliminar Contenedores**
+
+Para detener los contenedores:
+
+```bash
+docker-compose down
+```
+
+Con esto, hemos replicado la práctica utilizando contenedores, simplificando la gestión y asegurando un entorno reproducible.
 
 
 
