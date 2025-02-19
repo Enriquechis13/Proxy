@@ -313,7 +313,7 @@ Acceder a `http://www.example.test`
 
 ![Imagen proxy](img/CapturaAMPLIACION2.PNG)
 
-### **6. Detener y Eliminar Contenedores**
+**6. Detener y Eliminar Contenedores**
 
 Para detener los contenedores:
 
