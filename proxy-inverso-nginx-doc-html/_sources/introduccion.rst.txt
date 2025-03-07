@@ -1,0 +1,154 @@
+Introducción
+------------
+
+Comunicación típica
+~~~~~~~~~~~~~~~~~~~
+
+Tomemos como ejemplo una comunicación típica para ver una página web:
+
+.. uml:: uml/no-proxy-comunicacion.uml
+   :caption: Comunicación con un servidor web	 
+   :align: center
+
+En una comunicación estándar por Internet, la máquina del *Usuario* se
+comunicaría directamente con la máquina *Web*, con el cliente enviando
+solicitudes al servidor de origen y el servidor de origen respondiendo
+al cliente.
+
+¿Qué es un servidor proxy?
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Ahora veamos que pasa si introducimos un intermediario:
+
+.. uml:: uml/proxy-reenvio.uml
+   :caption: Proxy de reenvío
+   :align: center	     
+
+Cuando hay un intermediario (proxy de reenvío), *Usuario* enviará
+solicitudes a *Proxy*, que luego reenviará la solicitud a *Web*. *Web*
+enviará una respuesta a *Proxy*, que reenviará la respuesta a el
+*Usuario*.
+
+.. uml:: uml/proxy-comunicacion.uml
+   :caption: Comunicación con un intermediario	 
+   :align: center	   
+	   
+.. important::
+
+   Un *proxy de reenvío*, a menudo llamado *proxy*, servidor proxy o
+   proxy web, es un servidor que se encuentra frente a un grupo de
+   máquinas cliente.  Cuando esas máquinas realizan solicitudes a
+   sitios y servicios en Internet, el servidor proxy intercepta esas
+   solicitudes y luego se comunica con los servidores web en nombre de
+   esos clientes, como un intermediario.
+
+¿Por qué agregar este intermediario adicional a nuestra actividad en
+Internet?
+
+Hay algunas razones por las que uno podría querer usar un proxy de
+reenvío:
+
+**Para evitar restricciones de navegación estatales o institucionales**
+   algunos gobiernos, escuelas y otras organizaciones usan firewalls
+   para dar a sus usuarios acceso a una versión limitada de
+   Internet. Se puede usar un proxy de reenvío para sortear estas
+   restricciones, ya que permiten que el usuario se conecte al proxy
+   en lugar de directamente a los sitios que está visitando.
+
+**Para bloquear el acceso a cierto contenido**
+   a la inversa, los proxies también se pueden configurar para
+   bloquear el acceso de un grupo de usuarios a ciertos sitios. Por
+   ejemplo, una red escolar puede estar configurada para conectarse a
+   la web a través de un proxy que habilita reglas de filtrado de
+   contenido, negándose a reenviar respuestas de Facebook y otros
+   sitios de redes sociales.
+
+**Para proteger su identidad en línea**
+   en algunos casos, los usuarios habituales de Internet simplemente
+   desean un mayor anonimato en línea, pero en otros casos, los
+   usuarios de Internet viven en lugares donde el gobierno puede
+   imponer graves consecuencias a los disidentes políticos. Criticar
+   al gobierno en un foro web o en las redes sociales puede dar lugar
+   a multas o encarcelamiento para estos usuarios. Si uno de estos
+   disidentes usa un proxy de reenvío para conectarse a un sitio web
+   donde publica comentarios políticamente sensibles, la dirección IP
+   utilizada para publicar los comentarios será más difícil de
+   rastrear hasta el disidente. Solo estará visible la dirección IP
+   del servidor proxy.
+
+¿En qué se diferencia un proxy inverso?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Estaríamos hablando del caso opuesto al anterior.
+
+.. uml:: uml/proxy-inverso.uml
+   :caption: Proxy inverso	 
+   :align: center	   
+
+Un proxy inverso es un servidor que se encuentra frente a uno o más
+servidores web, interceptando las solicitudes de los clientes. Esto es
+diferente de un proxy de reenvío, donde el proxy se encuentra frente a
+los clientes. Con un proxy inverso, cuando los clientes envían
+solicitudes al servidor de un sitio web, esas solicitudes son
+interceptadas en la frontera de la red por el servidor proxy
+inverso. El servidor proxy inverso enviará solicitudes y recibirá
+respuestas del servidor del sitio web.
+
+La diferencia entre un proxy directo y inverso es sutil pero
+importante.  Una forma simplificada de resumir sería decir que un
+**proxy de reenvío** se encuentra frente a un cliente y garantiza que
+ningún servidor de origen se comunique nunca directamente con ese
+cliente específico. Por otro lado, un **proxy inverso** se encuentra
+frente a un servidor de origen y garantiza que ningún cliente se
+comunique nunca directamente con ese servidor de origen.
+
+Una vez más, ilustremos la operación:
+
+.. uml:: uml/proxy-inverso-comunicacion.uml
+   :caption: Comunicación con proxy inverso
+   :align: center	   
+
+Beneficios de un proxy inverso
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A continuación se describen algunos de los beneficios de un proxy
+inverso:
+
+**Balanceo de carga**
+   es posible que un sitio web popular que recibe millones de usuarios
+   todos los días no pueda manejar todo el tráfico entrante del sitio
+   con un solo servidor de origen. En cambio, el sitio se puede
+   distribuir entre un grupo de servidores diferentes, todos manejando
+   solicitudes para el mismo sitio. En este caso, un proxy inverso
+   puede proporcionar una solución de balanceo de carga que
+   distribuirá el tráfico entrante de manera uniforme entre los
+   diferentes servidores para evitar que un solo servidor se
+   sobrecargue. En el caso de que un servidor falle por completo,
+   otros servidores pueden intensificar para manejar el tráfico.
+
+**Protección contra ataques**
+   con un proxy inverso en su lugar, un sitio web o servicio nunca
+   necesita revelar la dirección IP de su (s) servidor (es) de
+   origen. Esto hace que sea mucho más difícil para los atacantes
+   aprovechar un ataque dirigido contra ellos, como un ataque DdoS.
+
+**Almacenamiento en caché**
+   un proxy inverso también puede almacenar contenido en caché, lo
+   que resulta en un rendimiento más rápido. Por ejemplo, si un
+   usuario en París visita un sitio web con proxy inverso con
+   servidores web en Los Ángeles, el usuario podría conectarse a un
+   servidor proxy inverso local en París, que luego tendrá que
+   comunicarse con un servidor de origen en Los Ángeles. El servidor
+   proxy luego puede almacenar en caché (o guardar temporalmente) los
+   datos de respuesta. Los usuarios parisinos posteriores que naveguen
+   por el sitio obtendrán la versión en caché local del servidor proxy
+   inverso parisino, lo que dará como resultado un rendimiento mucho
+   más rápido.
+
+**Cifrado SSL**
+   Cifrado y descifrado SSL (o TLS comunicaciones) para cada cliente
+   pueden ser computacionalmente caro para un servidor de origen. Se
+   puede configurar un proxy inverso para descifrar todas las
+   solicitudes entrantes y cifrar todas las respuestas salientes,
+   liberando valiosos recursos en el servidor de origen.
+

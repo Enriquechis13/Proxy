@@ -1,0 +1,104 @@
+Proxy inverso
+-------------
+
+Vamos a configurar dos Debian con sendos servidores Nginx para el
+dominio ``example.test``.
+
+- El primero servidor con Nginx servirá páginas web y lo llamaremos
+  *w1*.
+
+- El otro servidor con Nginx estará configurado como proxy inverso al
+  cual llamaremos *proxy*. Externamente conectaremos a este servidor
+  con la URL ``www.example.test`` por la dirección ``192.168.57.10``.
+
+- Realizaremos las peticiones HTTP desde el navegador web de nuestra
+  máquina física/anfitrión hacia el proxy, que nos redirigirá al
+  servidor web original.
+
+.. uml:: uml/proxy-inverso-web.uml
+   :caption: Diagrama de red	 
+   :align: center	 
+
+El código de Vagrant para el despliegue sería el siguiente:
+
+.. literalinclude:: ../files/Vagrantfile
+   :language: ruby
+   :caption: Fichero ``Vagrantfile``
+
+Para que todo quede más diferenciado y os quede más claro que la
+petición está pasando por el proxy inverso y llega al servidor web
+destino, vamos a hacer que cada uno de los servidores escuche las
+peticiones en un puerto distinto.
+
+El servidor *proxy* estará escuchando en el puerto ``80`` de la red
+privada ``192.168.57.0/24`` en la dirección ``192.168.57.10`` mientras que 
+*w1* estará escuchando en el puerto ``8080`` con la dirección ``192.168.57.11``. 
+No podemos acceder directamente a *w1* ya que no hemos redirigido los puertos.
+
+Servidor *w1*
+^^^^^^^^^^^^^^
+
+Configuraremos el servidor w1 con los siguientes pasos:
+
+1. Sobre-escribiremos el archivo de configuración del sitio web:
+
+.. literalinclude:: ../files/w1/default
+   :language: nginx
+   :caption: Fichero /etc/nginx/sites-available/default
+
+2. Reiniciaremos Nginx para aplicar los cambios:
+
+.. code-block:: bash
+
+   sudo systemctl restart nginx
+
+3. Crearemos una página web de prueba en:
+
+.. literalinclude:: ../files/w1/index.html
+   :language: html
+   :caption: Fichero ``/var/www/html/index.html``
+
+4. Con esta configuración, el servidor w1 estará accesible en el
+   puerto 8080, *pero no podemos acceder a él a no ser que
+   redireccionemos los puertos*.
+
+Podemos probarlo conectándonos al servidor e instalar ``curl``:
+
+.. code-block:: bash
+
+   sudo apt install -y curl
+  
+y acceder a la página web:
+
+.. code-block:: bash
+
+   curl http://localhost:8080
+
+Nginx proxy inverso
+^^^^^^^^^^^^^^^^^^^
+
+Para poder resolver el nombre del servidor web y no utilizar IP modificaremos 
+el fichero *hosts*.
+
+.. code-block:: 
+   :caption: Añadir las líneas al fichero /etc/hosts de 'proxy'
+
+   # Dirección IP del servidor web 'w1'
+   192.168.57.11 w1
+
+Configuraremos ahora el servidor *proxy*, para ello modificaremos el fichero 
+de configuración del sitio web por defecto:
+
+.. literalinclude:: ../files/proxy/default
+   :language: nginx
+   :caption: Fichero /etc/nginx/sites-available/default
+
+Reiniciamos el servicio:
+
+.. code-block:: bash
+   
+   sudo systemctl restart nginx
+
+Ahora al acceder a ``http://www.example.test`` el proxy nos redirigirá a 
+``http://w1:8080``, el servidor web que configuramos en el punto anterior
+para que escuche en el puerto 8080.

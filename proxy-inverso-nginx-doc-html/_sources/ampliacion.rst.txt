@@ -1,0 +1,6 @@
+Ampliación
+----------
+
+Repite la práctica anterior con contenedores, realizando
+un contenedor para *web*, otro para *proxy* y un Fichero
+``compose.yml`` para conectarlos.
