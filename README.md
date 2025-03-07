@@ -7,6 +7,8 @@ La configuración incluye:
 1. **Servidor Proxy**: `proxy` (Nginx), dirección `192.168.57.10`.
 2. **Servidor Web**: `w1` (Nginx), dirección `192.168.57.11`.
 
+#config.vm.network "forwarded_port", guest: 8080, host: 8080 PARA REDIRIGIR LOS PUERTOS PARA TOMCAT
+
 Las peticiones a `http://www.example.test` llegan al proxy, que las redirige al servidor web `w1` en el puerto 8080.
 
 ### Diagrama de Red (PlantUML)
